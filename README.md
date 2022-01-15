@@ -2,7 +2,7 @@
 
 A simple webpage to detect blinks using Javascript.
 
-See it live here:
+See it live here: https://gavinhenderson.github.io/detecting-blinks/
 
 Read about how this works on my blog: https://gavinhenderson.me
 
