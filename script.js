@@ -1,4 +1,3 @@
-// Get the input and output elements from the DOM
 const videoElement = document.getElementById("input");
 const canvasElement = document.getElementById("output");
 const canvasCtx = canvasElement.getContext("2d");
@@ -23,10 +22,11 @@ const onResults = (results) => {
     // Loop over the groups of landmarks. There is a group for each face
     for (const landmarks of results.multiFaceLandmarks) {
       // Use drawing utils to draw lines around the eyes
-      drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_EYE, {
-        color: "#30FF30",
+      drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_EYE, {
+        color: "#FF3030",
       });
-      drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_IRIS, {
+
+      drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_EYE, {
         color: "#30FF30",
       });
     }
