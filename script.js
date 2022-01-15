@@ -18,20 +18,6 @@ const onResults = (results) => {
   );
 
   // If the results includes landmarks then it has found a face we can look at.
-  if (results.multiFaceLandmarks) {
-    // Loop over the groups of landmarks. There is a group for each face
-    for (const landmarks of results.multiFaceLandmarks) {
-      // Use drawing utils to draw lines around the eyes
-      drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_EYE, {
-        color: "#FF3030",
-      });
-
-      drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_EYE, {
-        color: "#30FF30",
-      });
-    }
-  }
-
   canvasCtx.restore();
 };
 
@@ -53,12 +39,37 @@ faceMesh.setOptions({
 // Call our onResults callback every time FaceMesh processes a frame
 faceMesh.onResults(onResults);
 
-// Start the camera using the camera utils
-const camera = new Camera(videoElement, {
-  onFrame: async () => {
-    await faceMesh.send({ image: videoElement });
-  },
-  width: 1280,
-  height: 720,
+let firstFrame = true;
+
+const fitCanvasToWindow = () => {
+  const { videoHeight, videoWidth } = videoElement;
+  const windowHeight = window.innerHeight;
+  const windowWidth = window.innerWidth;
+
+  const heightRatio = windowHeight / videoHeight;
+
+  canvasElement.height = windowHeight;
+  canvasElement.width = Math.min(videoWidth * heightRatio, windowWidth);
+};
+
+const processFrame = async () => {
+  // We don't know the size of the video until we process a frame.
+  // however, we only want to do this once.
+  if (firstFrame) {
+    firstFrame = false;
+
+    // Resize the canvas
+    fitCanvasToWindow();
+    window.addEventListener("resize", fitCanvasToWindow);
+  }
+
+  await faceMesh.send({ image: videoElement });
+
+  videoElement.requestVideoFrameCallback(processFrame);
+};
+
+navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+  videoElement.srcObject = stream;
+
+  videoElement.requestVideoFrameCallback(processFrame);
 });
-camera.start();
